@@ -7,7 +7,7 @@ import 'forgot_password.dart';
 import 'home.dart';
 import 'widgets/notification_helper.dart';
 
-const String kApiBaseUrl = 'http://10.202.24.31:4000';
+const String kApiBaseUrl = 'http://localhost:4000';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

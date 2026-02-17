@@ -5,7 +5,7 @@ const moodSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true, // теперь обязателен
+      required: true,
     },
     date: {
       type: Date,
@@ -24,7 +24,6 @@ const moodSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Чтобы нельзя было сохранить 2 записи на один день у одного пользователя
 moodSchema.index({ userId: 1, date: 1 }, { unique: true });
 
 module.exports = mongoose.model('Mood', moodSchema);

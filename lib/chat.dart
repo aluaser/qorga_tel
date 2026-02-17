@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-const String kApiBaseUrl = 'http://10.202.24.31:4000';
+const String kApiBaseUrl = 'http://localhost:4000';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});

@@ -11,7 +11,7 @@ import 'help.dart';
 import 'about_us.dart';
 import 'test.dart';
 
-const String kApiBaseUrl = 'http://10.202.24.31:4000';
+const String kApiBaseUrl = 'http://localhost:4000';
 
 const Color kPrimaryColor = Color(0xFF3B82F6);
 

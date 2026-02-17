@@ -31,7 +31,6 @@ const userSchema = new mongoose.Schema(
       default: 'user',
     },
 
-    // забыли пароль
     resetCode: {
       type: String,
     },

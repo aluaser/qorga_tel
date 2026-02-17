@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'login.dart';
 import 'static.dart';
 
-const String _baseUrl = "http://10.202.24.31:4000";
+const String _baseUrl = "http://localhost:4000";
 
 const Color kPrimaryColor = Color(0xFF3B82F6);
 

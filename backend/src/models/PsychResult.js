@@ -12,8 +12,8 @@ const psychResultSchema = new mongoose.Schema(
     stateText: { type: String, required: true },
     answers: [
       {
-        questionId: { type: String, required: true }, // q1, q2, ...
-        value: { type: Number, required: true },      // 1–4
+        questionId: { type: String, required: true }, 
+        value: { type: Number, required: true },      
       },
     ],
   },
