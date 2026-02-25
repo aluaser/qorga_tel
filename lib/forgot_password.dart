@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'config.dart';
 import 'widgets/notification_helper.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -23,7 +24,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   bool _isNewPassObscured = true;
   bool _isConfirmPassObscured = true;
 
-  final String _baseUrl = "http://10.202.24.31:4000/auth";
+  final String _baseUrl = "$apiBaseUrl/auth";
 
   Future<void> _sendCode() async {
     if (!_formKey.currentState!.validate() || _emailController.text.isEmpty) {

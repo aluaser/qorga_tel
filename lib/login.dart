@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'config.dart';
 import 'forgot_password.dart';
 import 'home.dart';
 import 'widgets/notification_helper.dart';
-
-const String kApiBaseUrl = 'http://localhost:4000';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -32,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final uri = Uri.parse("$kApiBaseUrl/auth/login");
+      final uri = Uri.parse("$apiBaseUrl/auth/login");
       final res = await http.post(
         uri,
         headers: {"Content-Type": "application/json"},
@@ -51,6 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
           await prefs.setString('userId', user['id'] ?? '');
           await prefs.setString('email', user['email'] ?? '');
           await prefs.setString('name', user['displayName'] ?? '');
+          await prefs.setString('role', user['role'] ?? 'user');
 
           if (!mounted) return;
 

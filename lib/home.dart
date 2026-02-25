@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'chat.dart';
+import 'config.dart';
 import 'mood.dart';
 import 'login.dart';
 import 'profile.dart';
@@ -10,8 +11,6 @@ import 'news.dart';
 import 'help.dart';
 import 'about_us.dart';
 import 'test.dart';
-
-const String kApiBaseUrl = 'http://localhost:4000';
 
 const Color kPrimaryColor = Color(0xFF3B82F6);
 
@@ -62,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
       context,
       MaterialPageRoute(
         builder: (_) => PsychologyTestScreen(
-          baseUrl: kApiBaseUrl,
+          baseUrl: apiBaseUrl,
           userId: _userId!,
         ),
       ),
@@ -96,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
         context,
         MaterialPageRoute(
           builder: (_) => MoodPage(
-            baseUrl: kApiBaseUrl,
+            baseUrl: apiBaseUrl,
             userId: _userId!,
           ),
         ),

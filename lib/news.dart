@@ -1,378 +1,350 @@
+import 'dart:io';
+import 'dart:convert';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class NewsScreen extends StatelessWidget {
+import 'config.dart';
+
+class NewsScreen extends StatefulWidget {
   const NewsScreen({super.key});
 
-  List<Map<String, dynamic>> get articles => [
-        {
-          'title': 'Мектептегі буллинг үшін жауапкершілік күшейтілді',
-          'subtitle':
-              'Орта білім беру ұйымдарында оқушыларды психологиялық қысымнан қорғау нормалары енгізілді.',
-          'description':
-              'Енді мектеп әкімшілігі буллинг фактісін жасырса, ата-аналарға да, білім мекемесіне де ескерту және айыппұл салынуы мүмкін.',
-          'image':
-              'https://images.pexels.com/photos/8989986/pexels-photo-8989986.jpeg?auto=compress&cs=tinysrgb&w=1200',
-          'source': 'Оқу-ағарту министрлігі',
-          'date': '2025-11-02',
-          'category': 'Заң',
-          'content':
-              'Қазақстанда балаларды буллингтен және кибербуллингтен қорғау бойынша жаңа нормалар күшіне енді. Бұл нормаларға сәйкес әрбір білім беру ұйымы буллингтің алдын алу жоспарын жасап, ата-аналармен және оқушылармен түсіндіру жұмыстарын өткізуге міндетті. \n\nСонымен қатар, мектептерде сенім жәшіктері мен онлайн шағым беру арнасы болуы керек. Буллинг туралы хабарлама жасырылса немесе дер кезінде тіркелмесе, мектеп әкімшілігіне тәртіптік жаза қолданылуы мүмкін. \n\nБұл өзгерістер балалардың қауіпсіз ортада білім алуына жағдай жасауға бағытталған.',
-        },
-        {
-          'title': 'Кибербуллингтен қалай қорғануға болады?',
-          'subtitle':
-              'Әлеуметтік желідегі қысым да психологиялық жарақат қалдырады.',
-          'description':
-              'Маманның айтуынша, бірінші қадам — агрессормен диалогқа бармау және дәлел жинау.',
-          'image':
-              'https://images.pexels.com/photos/3974408/pexels-photo-3974408.jpeg?auto=compress&cs=tinysrgb&w=1200',
-          'source': 'Balalyq Online',
-          'date': '2025-11-01',
-          'category': 'Психология',
-          'content':
-              'Кибербуллинг — бұл әлеуметтік желілерде, мессенджерлерде немесе ойын платформаларында басқа адамға жүйелі түрде зиян келтіру, қорқыту немесе масқаралау. \n\nЕгер сіз немесе балаңыз кибербуллингке ұшыраса:\n1) Қарсы жауап жазбаңыз — бұл агрессорға күш береді;\n2) Скриншоттар мен сілтемелерді сақтаңыз — қажет болғанда дәлел ретінде көрсетесіз;\n3) Платформа әкімшілігіне немесе модераторға шағымданыңыз;\n4) Егер қорқытулар өмірге қауіп төндірсе — дереу құқық қорғау органдарына жүгініңіз;\n5) Психологпен сөйлесіп, өзіңізді кінәламаңыз.',
-        },
-        {
-          'title': 'Психолог: “Баланы ұялту емес, тыңдау керек”',
-          'subtitle': 'Буллинг құрбандары көбіне үнсіз қалады.',
-          'description':
-              'Мектепте қорланған бала көп жағдайда “дәрменсіз” рөлінде қалып қояды. Оған сенетін ересек адам керек.',
-          'image':
-              'https://images.pexels.com/photos/4100423/pexels-photo-4100423.jpeg?auto=compress&cs=tinysrgb&w=1200',
-          'source': 'Psiholog.kz',
-          'date': '2025-10-30',
-          'category': 'Психология',
-          'content':
-              'Баладан “неге жауап бермедің?”, “неге айтпадың?” деп сұраудың орнына “сенің басыңнан не өтті?” деп сұрау дұрыс. Баланың эмоциясын жоққа шығармай, оны тыңдаған маңызды. \n\nПсихологтың айтуынша, буллинг көрген балаларда өзіне сенім төмендейді, ұйқы және тәбет бұзылады, оқуға қызығушылық жоғалады. Сондықтан ата-ана да, мұғалім де баланың мінез-құлқындағы өзгерісті ерте байқауы керек.',
-        },
-        {
-          'title': 'Qorga платформасы арқылы аноним көмек алуға болады',
-          'subtitle':
-              'Жасөспірімдер үшін тәулік бойы онлайн қолдау іске қосылды.',
-          'description':
-              'Пайдаланушы аты-жөнін көрсетпей, тек жазбаша немесе аудио хабарлама қалдыра алады.',
-          'image':
-              'https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=1200',
-          'source': 'Qorga Team',
-          'date': '2025-10-29',
-          'category': 'Жоба',
-          'content':
-              'Qorga — буллингке, зорлық-зомбылыққа, отбасындағы кикілжіңдерге тап болған жастарға арналған цифрлық қолдау жобасы. Платформада бірнеше бөлім бар: жедел байланыс, психологиялық мақалалар, заң көмегі, пайдалы контактілер. \n\nАнонимдік — басты принцип. Бұл жасөспірімдердің ашық жазуына көмектеседі.',
-        },
-        {
-          'title': 'Ата-аналарға арналған 5 кеңес',
-          'subtitle': 'Балаңыз буллингке ұшырауы мүмкін белгілер.',
-          'description':
-              'Балаңыз сабақты себепсіз жіберіп алса немесе телефонын жасырса — назар аударыңыз.',
-          'image':
-              'https://images.pexels.com/photos/4473998/pexels-photo-4473998.jpeg?auto=compress&cs=tinysrgb&w=1200',
-          'source': 'Otбасы және мектеп',
-          'date': '2025-10-25',
-          'category': 'Ата-ана',
-          'content':
-              '1. Баланың көңіл-күйі күрт өзгерсе;\n2. Мектепке барғысы келмесе;\n3. Киімі, заттары жоғалып жүрсе;\n4. Телефон/желі туралы айтқысы келмесе;\n5. Ұйқысы бұзылса — бұл мектептегі қысымның белгісі болуы мүмкін. \n\nМұндайда баланы ұрыспай, “бірге шешеміз” деген форматта сөйлесу қажет.',
-        },
-        {
-          'title': 'Мектеп психологына қашан жүгіну керек?',
-          'subtitle': 'Әр мектепте маман бар, бірақ бәрі білмейді.',
-          'description':
-              'Психологқа тек “ауыр” жағдайларда емес, алдын алу үшін де баруға болады.',
-          'image':
-              'https://images.pexels.com/photos/3958461/pexels-photo-3958461.jpeg?auto=compress&cs=tinysrgb&w=1200',
-          'source': 'Bilim Medya',
-          'date': '2025-10-20',
-          'category': 'Мектеп',
-          'content':
-              'Психолог – балаға жан дүниесін қауіпсіз ортада ашуға мүмкіндік беретін маман. Егер балаңыз мектеп туралы сөйлескісі келмесе, құрбы-құрдастарымен жиі ұрысып жүрсе, өзіне сенімсіз болса – мектеп психологына жолыққан дұрыс.',
-        },
-        {
-          'title': 'Заңгер түсіндіреді: балаңызға желіде қорқыту жазса...',
-          'subtitle': 'Скриншот жинау – ең бірінші қадам.',
-          'description':
-              'Кибербуллинг те заңмен қорғалады. Әсіресе жүйелі түрде қайталанса.',
-          'image':
-              'https://images.pexels.com/photos/60621/pexels-photo-60621.jpeg?auto=compress&cs=tinysrgb&w=1200',
-          'source': 'Law QZ',
-          'date': '2025-10-15',
-          'category': 'Заң',
-          'content':
-              'Егер интернетте балаңызды қорқытатын, масқаралайтын, жеке суретін тарататын хабарламалар келсе – бұл кибербуллинг. ҚР заңнамасы бойынша, мұндай әрекеттер үшін әкімшілік жауапкершілікке тартуға болады. Дәлел ретінде: скриншоттар, хат алмасу, профиль сілтемесі, уақыт пен дата қажет болады. \n\nЕгер қорқытуда “зиян келтіремін” деген нақты элементтер болса – полицияға жүгінуге болады.',
-        },
-      ];
-
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF2F5FB),
-      appBar: AppBar(
-        title: const Text(
-          'Жаңалықтар',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: const Color(0xFFAEC9E3),
-        foregroundColor: Colors.white,
-        centerTitle: true,
-      ),
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: _NewsHeader(),
-          ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final article = articles[index];
-                return _NewsCard(
-                  article: article,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => NewsDetailScreen(article: article),
-                      ),
-                    );
-                  },
-                );
-              },
-              childCount: articles.length,
-            ),
-          ),
-          const SliverToBoxAdapter(child: SizedBox(height: 16)),
-        ],
-      ),
-    );
-  }
+  State<NewsScreen> createState() => _NewsScreenState();
 }
 
-class _NewsHeader extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFFAEC9E3),
-            Color(0xFF8AAED1),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Row(
-        children: [
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Балалар қауіпсіздігі',
-                    style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500)),
-                SizedBox(height: 8),
-                Text(
-                  'Буллингке қарсы материалдар',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800),
-                ),
-                SizedBox(height: 6),
-                Text(
-                  'Заң, психологиялық кеңес, ата-аналарға арналған нұсқаулықтар.',
-                  style: TextStyle(color: Colors.white, fontSize: 13),
-                )
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            height: 70,
-            width: 70,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Icon(Icons.shield, color: Colors.white, size: 34),
-          )
-        ],
-      ),
-    );
-  }
+class _Lot {
+  final String id;
+  final String psychologistName;
+  final String title;
+  final String description;
+  final String videoUrl;
+  final String videoOriginalName;
+  final DateTime? createdAt;
+
+  _Lot({
+    required this.id,
+    required this.psychologistName,
+    required this.title,
+    required this.description,
+    required this.videoUrl,
+    required this.videoOriginalName,
+    this.createdAt,
+  });
 }
 
-class _NewsCard extends StatelessWidget {
-  final Map<String, dynamic> article;
-  final VoidCallback onTap;
-  const _NewsCard({required this.article, required this.onTap});
+class _NewsScreenState extends State<NewsScreen> {
+  bool _loading = true;
+  bool _creating = false;
+  String? _userId;
+  String _role = 'user';
+  List<_Lot> _lots = [];
 
   @override
-  Widget build(BuildContext context) {
-    final img = article['image'] as String?;
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE6F0F9),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius:
-                  const BorderRadius.horizontal(left: Radius.circular(16)),
-              child: SizedBox(
-                height: 120,
-                width: 120,
-                child: img != null && img.isNotEmpty
-                    ? Image.network(
-                        img,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return _newsImagePlaceholder();
-                        },
-                      )
-                    : _newsImagePlaceholder(),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 12, top: 12, bottom: 12),
+  void initState() {
+    super.initState();
+    _bootstrap();
+  }
+
+  Future<void> _bootstrap() async {
+    final prefs = await SharedPreferences.getInstance();
+    _userId = prefs.getString('userId');
+    _role = (prefs.getString('role') ?? 'user').trim();
+    await _loadLots();
+  }
+
+  Future<void> _loadLots() async {
+    try {
+      final res = await http.get(Uri.parse('$apiBaseUrl/content/lots'));
+      if (res.statusCode != 200) {
+        if (mounted) setState(() => _loading = false);
+        return;
+      }
+
+      final body = jsonDecode(res.body) as Map<String, dynamic>;
+      final items = (body['items'] as List?) ?? [];
+
+      final lots = items.map((raw) {
+        final m = raw as Map<String, dynamic>;
+        return _Lot(
+          id: '${m['id']}',
+          psychologistName: '${m['psychologistName'] ?? 'Психолог'}',
+          title: '${m['title'] ?? ''}',
+          description: '${m['description'] ?? ''}',
+          videoUrl: '${m['videoUrl'] ?? ''}',
+          videoOriginalName: '${m['videoOriginalName'] ?? ''}',
+          createdAt: m['createdAt'] == null ? null : DateTime.tryParse('${m['createdAt']}'),
+        );
+      }).toList();
+
+      if (!mounted) return;
+      setState(() {
+        _lots = lots;
+        _loading = false;
+      });
+    } catch (_) {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _openCreateLotDialog() async {
+    final titleCtrl = TextEditingController();
+    final descriptionCtrl = TextEditingController();
+    PlatformFile? selectedVideo;
+
+    await showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setLocalState) {
+            return AlertDialog(
+              title: const Text('Жаңа лот қосу'),
+              content: SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (article['category'] != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Text(
-                          article['category'],
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF4F5B77),
-                          ),
-                        ),
-                      ),
-                    const SizedBox(height: 6),
-                    Text(
-                      article['title'],
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF202533),
+                    TextField(
+                      controller: titleCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Тақырып',
+                        border: OutlineInputBorder(),
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    if (article['description'] != null)
-                      Text(
-                        article['description'],
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 12),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: descriptionCtrl,
+                      maxLines: 4,
+                      decoration: const InputDecoration(
+                        labelText: 'Сипаттама',
+                        border: OutlineInputBorder(),
                       ),
-                    const SizedBox(height: 6),
-                    Text(
-                      '${article['source']} • ${article['date']}',
-                      style: const TextStyle(fontSize: 11, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: () async {
+                        final result = await FilePicker.platform.pickFiles(
+                          type: FileType.video,
+                          withData: true,
+                        );
+                        if (result == null || result.files.isEmpty) return;
+                        setLocalState(() => selectedVideo = result.files.first);
+                      },
+                      icon: const Icon(Icons.video_file),
+                      label: Text(
+                        selectedVideo == null
+                            ? 'Видео файл таңдау'
+                            : selectedVideo!.name,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
               ),
-            )
-          ],
-        ),
-      ),
+              actions: [
+                TextButton(
+                  onPressed: _creating ? null : () => Navigator.pop(ctx),
+                  child: const Text('Бас тарту'),
+                ),
+                ElevatedButton(
+                  onPressed: _creating
+                      ? null
+                      : () async {
+                          final title = titleCtrl.text.trim();
+                          final description = descriptionCtrl.text.trim();
+                          if (title.isEmpty || selectedVideo == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Тақырып пен видео файл міндетті')),
+                            );
+                            return;
+                          }
+
+                          await _createLot(
+                            title: title,
+                            description: description,
+                            video: selectedVideo!,
+                          );
+
+                          if (mounted) Navigator.pop(ctx);
+                        },
+                  child: _creating
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Жүктеу'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
-  Widget _newsImagePlaceholder() {
-    return Container(
-      color: Colors.blueGrey[100],
-      child: const Center(
-        child: Icon(
-          Icons.image_not_supported_outlined,
-          color: Colors.white70,
-          size: 32,
-        ),
-      ),
-    );
-  }
-}
+  Future<void> _createLot({
+    required String title,
+    required String description,
+    required PlatformFile video,
+  }) async {
+    if (_userId == null || _userId!.isEmpty) return;
 
-class NewsDetailScreen extends StatelessWidget {
-  final Map<String, dynamic> article;
-  const NewsDetailScreen({super.key, required this.article});
+    setState(() => _creating = true);
+    try {
+      List<int>? bytes = video.bytes;
+      if ((bytes == null || bytes.isEmpty) && video.path != null && video.path!.isNotEmpty) {
+        bytes = await File(video.path!).readAsBytes();
+      }
+      if (bytes == null || bytes.isEmpty) {
+        throw Exception('Video file payload is empty');
+      }
+
+      final resp = await http.post(
+        Uri.parse('$apiBaseUrl/content/lots'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'psychologistId': _userId,
+          'title': title,
+          'description': description,
+          'videoBase64': base64Encode(bytes),
+          'videoName': video.name,
+          'mimeType': video.extension == null ? 'video/mp4' : 'video/${video.extension}',
+        }),
+      );
+
+      if (resp.statusCode == 201) {
+        await _loadLots();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Лот сәтті жарияланды')),
+          );
+        }
+      } else {
+        final parsed = jsonDecode(resp.body) as Map<String, dynamic>;
+        final err = parsed['error']?.toString() ?? 'Жүктеу қатесі';
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
+        }
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Сервермен байланыс қатесі')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _creating = false);
+    }
+  }
+
+  Future<void> _openVideo(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final img = article['image'] as String?;
     return Scaffold(
       backgroundColor: const Color(0xFFF2F5FB),
       appBar: AppBar(
-        title: Text(article['title']),
-        backgroundColor: const Color(0xFFAEC9E3),
-        foregroundColor: Colors.white,
+        title: const Text('Психолог лоттары'),
+        centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (img != null && img.isNotEmpty)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(18),
-                child: Image.network(
-                  img,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) {
-                    return Container(
-                      height: 180,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      alignment: Alignment.center,
-                      child: const Icon(Icons.image_not_supported, size: 40),
-                    );
-                  },
-                ),
-              ),
-            const SizedBox(height: 14),
-            Text(
-              '${article['source']} • ${article['date']}',
-              style: const TextStyle(color: Colors.grey, fontSize: 12),
+      floatingActionButton: _role == 'psychologist'
+          ? FloatingActionButton.extended(
+              onPressed: _creating ? null : _openCreateLotDialog,
+              icon: const Icon(Icons.add),
+              label: const Text('Лот қосу'),
+            )
+          : null,
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: _loadLots,
+              child: _lots.isEmpty
+                  ? ListView(
+                      children: [
+                        SizedBox(height: 140),
+                        Center(
+                          child: Text(
+                            'Психологтардан жарияланған материалдар әлі жоқ.',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(12),
+                      itemCount: _lots.length,
+                      itemBuilder: (context, index) {
+                        final lot = _lots[index];
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  lot.title,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  lot.description,
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.person, size: 16),
+                                    const SizedBox(width: 6),
+                                    Expanded(
+                                      child: Text(
+                                        lot.psychologistName,
+                                        style: const TextStyle(fontWeight: FontWeight.w600),
+                                      ),
+                                    ),
+                                    if (lot.createdAt != null)
+                                      Text(
+                                        _formatDate(lot.createdAt!),
+                                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                FilledButton.icon(
+                                  onPressed: () => _openVideo(lot.videoUrl),
+                                  icon: const Icon(Icons.play_circle_fill),
+                                  label: Text(
+                                    lot.videoOriginalName.isEmpty
+                                        ? 'Видеоны ашу'
+                                        : 'Видео: ${lot.videoOriginalName}',
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
             ),
-            if (article['subtitle'] != null) ...[
-              const SizedBox(height: 12),
-              Text(
-                article['subtitle'],
-                style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF2A3142)),
-              ),
-            ],
-            const SizedBox(height: 14),
-            Text(
-              article['content'],
-              style: const TextStyle(fontSize: 15, height: 1.6),
-            ),
-          ],
-        ),
-      ),
     );
+  }
+
+  String _formatDate(DateTime dt) {
+    final y = dt.year.toString().padLeft(4, '0');
+    final m = dt.month.toString().padLeft(2, '0');
+    final d = dt.day.toString().padLeft(2, '0');
+    final hh = dt.hour.toString().padLeft(2, '0');
+    final mm = dt.minute.toString().padLeft(2, '0');
+    return '$y-$m-$d $hh:$mm';
   }
 }

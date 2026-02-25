@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'config.dart';
 import 'widgets/notification_helper.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -19,8 +20,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _nameController = TextEditingController();
 
   bool _isLoading = false;
-  final String _baseUrl = "http://10.202.24.31:4000";
-
   Future<void> _registerUser() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -28,7 +27,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _isLoading = true;
     });
 
-    final uri = Uri.parse("$_baseUrl/auth/register");
+    final uri = Uri.parse("$apiBaseUrl/auth/register");
     final body = {
       "email": _emailController.text.trim(),
       "password": _passwordController.text.trim(),

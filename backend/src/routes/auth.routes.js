@@ -39,6 +39,7 @@ router.post('/register', registerLimiter, async (req, res) => {
       email,
       passwordHash,
       displayName,
+      role: 'user',
     });
 
     const accessToken = jwt.sign(
@@ -55,6 +56,7 @@ router.post('/register', registerLimiter, async (req, res) => {
           id: user._id,
           email: user.email,
           displayName: user.displayName,
+          role: user.role,
         },
       },
     });
@@ -103,6 +105,7 @@ router.post('/login', loginLimiter, async (req, res) => {
           id: user._id,
           email: user.email,
           displayName: user.displayName,
+          role: user.role,
         },
       },
     });

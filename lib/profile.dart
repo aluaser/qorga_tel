@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'config.dart';
 import 'login.dart';
 import 'static.dart';
-
-const String _baseUrl = "http://localhost:4000";
 
 const Color kPrimaryColor = Color(0xFF3B82F6);
 
@@ -106,7 +105,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final month = now.month;
     final year = now.year;
 
-    final uri = Uri.parse("$_baseUrl/mood/stats").replace(
+    final uri = Uri.parse("$apiBaseUrl/mood/stats").replace(
       queryParameters: {
         "month": "$month",
         "year": "$year",
@@ -274,7 +273,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _isLoading = true;
     });
 
-    final uri = Uri.parse("$_baseUrl/user/$_userId");
+    final uri = Uri.parse("$apiBaseUrl/user/$_userId");
     final body = {
       "name": _nameController.text.trim(),
       "email": _emailController.text.trim(),
@@ -490,7 +489,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (_) => StatsScreen(
-                                baseUrl: _baseUrl,
+                                baseUrl: apiBaseUrl,
                                 userId: _userId!,
                               ),
                             ),
