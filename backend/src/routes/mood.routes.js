@@ -12,13 +12,9 @@ const MOOD_RISK_BAD_DAYS_THRESHOLD = 5;
 const MOOD_RISK_COOLDOWN_HOURS = 24;
 
 const SMTP_SERVICE = String(process.env.SMTP_SERVICE || 'gmail').trim();
-const SMTP_USER = String(process.env.SMTP_USER || process.env.GMAIL_USER || '').trim();
-const SMTP_PASS = String(
-  process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD || ''
-).trim();
-const MAIL_FROM = String(
-  process.env.SMTP_FROM || process.env.MAIL_FROM || SMTP_USER
-).trim();
+const SMTP_USER = String(process.env.SMTP_USER || '').trim();
+const SMTP_PASS = String(process.env.SMTP_PASS || '').trim();
+const SMTP_FROM = String(process.env.SMTP_FROM || SMTP_USER).trim();
 
 const smtpTransport = (SMTP_USER && SMTP_PASS)
   ? nodemailer.createTransport({
@@ -48,7 +44,7 @@ async function sendMoodRiskEmail(toEmail) {
   `;
 
   const result = await smtpTransport.sendMail({
-    from: MAIL_FROM,
+    from: SMTP_FROM,
     to: toEmail,
     subject,
     text,

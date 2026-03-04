@@ -63,7 +63,7 @@ app.set('io', io);
 
 const PORT = process.env.PORT || 4000;
 connectDB(process.env.MONGODB_URI)
-  .then(() => server.listen(PORT, () => console.log(`🚀 http://10.202.14.73:${PORT}`)))
+  .then(() => server.listen(PORT, () => console.log(`🚀 Server listening on port ${PORT}`)))
   .catch(err => {
     console.error('❌ Mongo connect error:', err.message);
     process.exit(1);
