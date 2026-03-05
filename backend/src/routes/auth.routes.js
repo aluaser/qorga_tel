@@ -15,6 +15,11 @@ const SMTP_SERVICE = String(process.env.SMTP_SERVICE || 'gmail').trim();
 const SMTP_USER = String(process.env.SMTP_USER || '').trim();
 const SMTP_PASS = String(process.env.SMTP_PASS || '').trim();
 const SMTP_FROM = String(process.env.SMTP_FROM || SMTP_USER).trim();
+const DEFAULT_PSYCHOLOGIST_EMAIL = String(
+  process.env.DEFAULT_PSYCHOLOGIST_EMAIL || ''
+)
+  .trim()
+  .toLowerCase();
 
 const smtpTransport = (SMTP_USER && SMTP_PASS)
   ? nodemailer.createTransport({
@@ -25,6 +30,14 @@ const smtpTransport = (SMTP_USER && SMTP_PASS)
       },
     })
   : null;
+
+function resolveRoleByEmail(email, fallbackRole = 'user') {
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  if (DEFAULT_PSYCHOLOGIST_EMAIL && normalizedEmail === DEFAULT_PSYCHOLOGIST_EMAIL) {
+    return 'psychologist';
+  }
+  return fallbackRole || 'user';
+}
 
 async function sendPasswordResetCodeEmail(toEmail, code) {
   if (!smtpTransport) {
@@ -90,7 +103,7 @@ router.post('/register', registerLimiter, async (req, res) => {
       email: normalizedEmail,
       passwordHash,
       displayName,
-      role: 'user',
+      role: resolveRoleByEmail(normalizedEmail, 'user'),
     });
 
     const accessToken = jwt.sign(
@@ -142,6 +155,12 @@ router.post('/login', loginLimiter, async (req, res) => {
 
     if (!passwordOk) {
       return res.status(401).json({ ok: false, error: 'Неверные email или пароль' });
+    }
+
+    const expectedRole = resolveRoleByEmail(normalizedEmail, user.role || 'user');
+    if (user.role !== expectedRole) {
+      user.role = expectedRole;
+      await user.save();
     }
 
     const token = jwt.sign(

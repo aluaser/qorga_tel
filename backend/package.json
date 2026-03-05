@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "email:test": "node src/send-gmail-test.js"
+    "email:test": "node src/send-gmail-test.js",
+    "psychologist:set": "node src/scripts/set-psychologist.js"
   },
   "keywords": [],
   "author": "",
