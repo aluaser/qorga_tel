@@ -38,6 +38,6 @@ services:
       - key: GEMINI_MODEL
         value: gemini-2.5-flash
       - key: DEFAULT_PSYCHOLOGIST_EMAIL
-        sync: false
+        value: blebpio@gmail.com
       - key: DEFAULT_PSYCHOLOGIST_GREETING
         sync: false

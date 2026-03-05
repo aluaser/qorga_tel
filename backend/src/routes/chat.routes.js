@@ -6,9 +6,9 @@ const User = require('../models/user');
 const ChatMessage = require('../models/ChatMessage');
 const { emitChatMessage } = require('../socket/chat.socket');
 
-const DEFAULT_PSYCHOLOGIST_EMAIL = (
-  process.env.DEFAULT_PSYCHOLOGIST_EMAIL || 'altyn2305@bk.ru'
-).toLowerCase();
+const DEFAULT_PSYCHOLOGIST_EMAIL = (process.env.DEFAULT_PSYCHOLOGIST_EMAIL || '')
+  .trim()
+  .toLowerCase();
 const DEFAULT_PSYCHOLOGIST_GREETING =
   (
     process.env.DEFAULT_PSYCHOLOGIST_GREETING ||
@@ -47,11 +47,21 @@ function mapMessage(m) {
   };
 }
 
-async function findPsychologistByEmail() {
+async function findDefaultPsychologist() {
+  if (DEFAULT_PSYCHOLOGIST_EMAIL) {
+    const byConfiguredEmail = await User.findOne(
+      { email: DEFAULT_PSYCHOLOGIST_EMAIL, role: 'psychologist' },
+      { email: 1, displayName: 1, role: 1 }
+    ).lean();
+    if (byConfiguredEmail?._id) return byConfiguredEmail;
+  }
+
   return User.findOne(
-    { email: DEFAULT_PSYCHOLOGIST_EMAIL },
+    { role: 'psychologist' },
     { email: 1, displayName: 1, role: 1 }
-  ).lean();
+  )
+    .sort({ createdAt: 1 })
+    .lean();
 }
 
 async function ensureDefaultPsychologistGreeting({ userId, psychologistId, io }) {
@@ -246,7 +256,7 @@ router.get('/list', async (req, res) => {
       return res.json({ ok: true, items, meRole: me.role });
     }
 
-    const psychologist = await findPsychologistByEmail();
+    const psychologist = await findDefaultPsychologist();
     const aiChatId = buildAiChatId(userId);
     const aiLast = await getLastMessageForChat(aiChatId, userId, null);
 
