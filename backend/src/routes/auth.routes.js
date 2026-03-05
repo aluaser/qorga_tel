@@ -2,34 +2,23 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
-const nodemailer = require('nodemailer');
 const User = require('../models/user');
 const { validatePassword } = require('../utils/password-policy');
+const { createSmtpTransport, getSmtpConfig } = require('../config/smtp');
 
 const router = express.Router();
 
 const ACCESS_TTL = process.env.ACCESS_TTL || '15m';
 const JWT_SECRET = process.env.JWT_ACCESS_SECRET || 'dev-secret';
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const SMTP_SERVICE = String(process.env.SMTP_SERVICE || 'gmail').trim();
-const SMTP_USER = String(process.env.SMTP_USER || '').trim();
-const SMTP_PASS = String(process.env.SMTP_PASS || '').trim();
-const SMTP_FROM = String(process.env.SMTP_FROM || SMTP_USER).trim();
+const { from: SMTP_FROM } = getSmtpConfig();
 const DEFAULT_PSYCHOLOGIST_EMAIL = String(
   process.env.DEFAULT_PSYCHOLOGIST_EMAIL || ''
 )
   .trim()
   .toLowerCase();
 
-const smtpTransport = (SMTP_USER && SMTP_PASS)
-  ? nodemailer.createTransport({
-      service: SMTP_SERVICE,
-      auth: {
-        user: SMTP_USER,
-        pass: SMTP_PASS,
-      },
-    })
-  : null;
+const smtpTransport = createSmtpTransport();
 
 function resolveRoleByEmail(email, fallbackRole = 'user') {
   const normalizedEmail = String(email || '').trim().toLowerCase();

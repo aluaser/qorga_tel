@@ -1,30 +1,18 @@
 // src/routes/mood.routes.js
 const express = require('express');
 const mongoose = require('mongoose');
-const nodemailer = require('nodemailer');
 const router = express.Router();
 const Mood = require('../models/mood');
 const User = require('../models/user');
 const UserAlert = require('../models/UserAlert');
+const { createSmtpTransport, getSmtpConfig } = require('../config/smtp');
 
 const MOOD_RISK_WINDOW_DAYS = 7;
 const MOOD_RISK_BAD_DAYS_THRESHOLD = 5;
 const MOOD_RISK_COOLDOWN_HOURS = 24;
 
-const SMTP_SERVICE = String(process.env.SMTP_SERVICE || 'gmail').trim();
-const SMTP_USER = String(process.env.SMTP_USER || '').trim();
-const SMTP_PASS = String(process.env.SMTP_PASS || '').trim();
-const SMTP_FROM = String(process.env.SMTP_FROM || SMTP_USER).trim();
-
-const smtpTransport = (SMTP_USER && SMTP_PASS)
-  ? nodemailer.createTransport({
-      service: SMTP_SERVICE,
-      auth: {
-        user: SMTP_USER,
-        pass: SMTP_PASS,
-      },
-    })
-  : null;
+const { from: SMTP_FROM } = getSmtpConfig();
+const smtpTransport = createSmtpTransport();
 
 async function sendMoodRiskEmail(toEmail) {
   if (!smtpTransport || !toEmail) {

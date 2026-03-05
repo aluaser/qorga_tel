@@ -1,29 +1,23 @@
-require('dotenv').config();
-const nodemailer = require('nodemailer');
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
-const SMTP_SERVICE = String(process.env.SMTP_SERVICE || 'gmail').trim();
-const SMTP_USER = String(process.env.SMTP_USER || '').trim();
-const SMTP_PASS = String(process.env.SMTP_PASS || '').trim();
-const SMTP_FROM = String(process.env.SMTP_FROM || SMTP_USER).trim();
+const { createSmtpTransport, getSmtpConfig } = require('./config/smtp');
+
+const { user: SMTP_USER, pass: SMTP_PASS, from: SMTP_FROM } = getSmtpConfig();
 const TEST_EMAIL_TO = String(process.env.TEST_EMAIL_TO || '').trim();
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 if (!SMTP_USER || !SMTP_PASS) {
   console.error('Set SMTP_USER/SMTP_PASS in backend/.env.');
   process.exit(1);
 }
 
-if (!TEST_EMAIL_TO) {
-  console.error('Set TEST_EMAIL_TO in backend/.env.');
+if (!TEST_EMAIL_TO || !EMAIL_REGEX.test(TEST_EMAIL_TO)) {
+  console.error('Set a valid TEST_EMAIL_TO in backend/.env.');
   process.exit(1);
 }
 
-const transporter = nodemailer.createTransport({
-  service: SMTP_SERVICE,
-  auth: {
-    user: SMTP_USER,
-    pass: SMTP_PASS,
-  },
-});
+const transporter = createSmtpTransport();
 
 async function run() {
   try {
